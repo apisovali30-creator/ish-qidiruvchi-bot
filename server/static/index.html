@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Farrosh va Enaga Xizmati | Oqila</title>
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=9.0">
+</head>
+<body>
+  <div class="mobile-viewport">
+    <div id="app" class="app-screen">
+
+      <!-- =========================================================================
+           TOP HEADER (As-salamu alaykum, Real Portrait Avatar & Notification Bell)
+           ========================================================================= -->
+      <header class="app-top-header">
+        <div class="user-profile-header">
+          <div class="user-avatar-circle" id="userHeaderAvatar">
+            <img src="" alt="Avatar" class="header-avatar-img" id="userHeaderImg" style="display: none;">
+            <div class="avatar-fallback" id="userHeaderFallback">A</div>
+          </div>
+          <div class="user-greeting-block">
+            <span class="greeting-salom">Assalomu alaykum,</span>
+            <h2 class="greeting-username" id="headerUserName">Ali</h2>
+          </div>
+        </div>
+        <button class="icon-circle-btn" id="headerNotifBtn" aria-label="Xabarnomalar">
+          <svg class="svg-icon-bell" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span class="notif-dot"></span>
+        </button>
+      </header>
+
+      <!-- =========================================================================
+           TAB 1: HOME / ASOSIY (SCREEN 1 STYLE)
+           ========================================================================= -->
+      <div class="tab-view active" id="viewHome">
+        
+        <!-- Horizontal Carousel for Domestic Professions & Filters -->
+        <section class="prayer-style-widget-section">
+          <div class="prayer-carousel" id="topIndustryCarousel">
+            <div class="prayer-pill-item active" data-prof="Farrosh">
+              <div class="prayer-icon-wrap">
+                <span style="font-size: 20px;">🧹</span>
+              </div>
+              <span class="prayer-title">Farroshlar</span>
+              <span class="prayer-sub">Tozalik ustalari</span>
+            </div>
+
+            <div class="prayer-pill-item" data-prof="Enaga">
+              <div class="prayer-icon-wrap">
+                <span style="font-size: 20px;">👶</span>
+              </div>
+              <span class="prayer-title">Enagalar</span>
+              <span class="prayer-sub">Bolalar parvarishi</span>
+            </div>
+
+            <div class="prayer-pill-item" data-prof="Buyurtmalar">
+              <div class="prayer-icon-wrap">
+                <span style="font-size: 20px;">📋</span>
+              </div>
+              <span class="prayer-title">Buyurtmalar</span>
+              <span class="prayer-sub">Mijoz e'lonlari</span>
+            </div>
+
+            <div class="prayer-pill-item" data-prof="Hammasi">
+              <div class="prayer-icon-wrap">
+                <span style="font-size: 20px;">⭐</span>
+              </div>
+              <span class="prayer-title">Barchasi</span>
+              <span class="prayer-sub">Eng saralangan</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Rich Photographic Warm Glowing Hero Banner -->
+        <section class="warm-hero-banner" id="heroBanner">
+          <div class="banner-gradient-overlay"></div>
+          <div class="banner-content">
+            <div class="banner-top-tag">
+              <span class="tag-fire">✨</span>
+              <span>Ishonchli va Sinalgan Uy Xizmatlari</span>
+            </div>
+            <h3 class="banner-heading">Farrosh va Enagalarni tez va oson toping!</h3>
+            <p class="banner-subtext">Diplomsiz ayollar uchun halol daromad, oilalar uchun saralangan, mijozlar baholagan (⭐) eng yaxshi xodimlar.</p>
+            <div class="banner-footer-row">
+              <button class="banner-cta-btn" id="startWizardBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Anketa / E'lon berish</span>
+              </button>
+              <div class="banner-dots">
+                <span class="b-dot active"></span>
+                <span class="b-dot"></span>
+                <span class="b-dot"></span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Services Section (Farrosh, Enaga, E'lon berish, Buyurtmalar, Profil) -->
+        <section class="services-row-section">
+          <div class="section-heading-row">
+            <h3 class="section-title">Bo'limlar</h3>
+            <button class="section-view-all-btn" id="btnServicesViewAll">Barchasi</button>
+          </div>
+          <div class="services-squircle-grid">
+            <button class="squircle-service-item service-orange" data-action="farrosh">
+              <div class="squircle-icon-box">
+                <span style="font-size: 22px;">🧹</span>
+              </div>
+              <span class="squircle-name">Farroshlar</span>
+            </button>
+
+            <button class="squircle-service-item service-blue" data-action="enaga">
+              <div class="squircle-icon-box">
+                <span style="font-size: 22px;">👶</span>
+              </div>
+              <span class="squircle-name">Enagalar</span>
+            </button>
+
+            <button class="squircle-service-item service-main" data-action="wizard">
+              <div class="squircle-icon-box orange-glow">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+              <span class="squircle-name">E'lon berish</span>
+            </button>
+
+            <button class="squircle-service-item service-purple" data-action="vacancies">
+              <div class="squircle-icon-box">
+                <span style="font-size: 22px;">📋</span>
+              </div>
+              <span class="squircle-name">Buyurtmalar</span>
+            </button>
+
+            <button class="squircle-service-item service-gold" data-action="profile">
+              <div class="squircle-icon-box">
+                <span style="font-size: 22px;">👤</span>
+              </div>
+              <span class="squircle-name">Profilim</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Program / Featured Jobs Section (2-Column Grid) -->
+        <section class="program-feed-section">
+          <div class="section-heading-row">
+            <h3 class="section-title">Eng yuqori baholangan xodimlar ⭐</h3>
+            <button class="section-view-all-btn" id="btnFeaturedViewAll">Barchasi</button>
+          </div>
+
+          <!-- 2-Column Cards Grid (Screen 1 & Screen 2) -->
+          <div class="feed-cards-grid" id="mainCardsGrid">
+            <div class="skeleton-shimmer-card"></div>
+            <div class="skeleton-shimmer-card"></div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- =========================================================================
+           TAB 2: EXPLORE / FARROSH & ENAGA RO'YXATI (SCREEN 2 STYLE)
+           ========================================================================= -->
+      <div class="tab-view" id="viewExplore">
+        
+        <!-- Screen 2 Top Title + Segmented Switcher Pill on Right -->
+        <div class="explore-top-bar">
+          <h2 class="explore-page-title" id="exploreHeaderTitle">Farroshlar</h2>
+          <div class="explore-segmented-toggle">
+            <button class="explore-seg-pill active" id="exploreSegFarrosh">🧹 Farroshlar</button>
+            <button class="explore-seg-pill" id="exploreSegEnaga">👶 Enagalar</button>
+            <button class="explore-seg-pill" id="exploreSegVacancies">📋 Buyurtmalar</button>
+          </div>
+        </div>
+
+        <!-- Screen 2 Search Bar with SVG Filter Button -->
+        <section class="search-section-wrap">
+          <div class="pill-search-bar">
+            <svg class="search-glass-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="exploreSearchInput" placeholder="Ism, tuman yoki ma'lumot bo'yicha qidirish...">
+            <button class="search-clear-btn" id="exploreClearSearch">✕</button>
+            <div class="filter-toggle-circle" id="exploreFilterToggle">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+            </div>
+          </div>
+
+          <!-- District / Region Dropdown Pill -->
+          <div class="region-filter-pill-wrap">
+            <select id="exploreRegionSelect" class="region-select-pill">
+              <option value="Hammasi">📍 Barcha tumanlar (Toshkent va viloyatlar)</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- Screen 2 Work Type Chips Horizontal Scroll -->
+        <section class="explore-chips-section">
+          <div class="explore-chips-scroll" id="exploreFilterChips">
+            <button class="cat-chip-btn active" data-wtype="Hammasi">⚡️ Barcha ish tartibi</button>
+            <button class="cat-chip-btn" data-wtype="Kunlik (Bir martalik)">Kunlik</button>
+            <button class="cat-chip-btn" data-wtype="Oylik (Doimiy)">Oylik</button>
+            <button class="cat-chip-btn" data-wtype="Soatbay">Soatbay</button>
+            <button class="cat-chip-btn" data-wtype="Yotib ishlash (Sutkalik)">Yotib ishlash</button>
+          </div>
+        </section>
+
+        <!-- 2-Column Cards Grid for Explore Feed -->
+        <section class="feed-cards-section">
+          <div class="feed-cards-grid" id="exploreCardsGrid">
+            <div class="skeleton-shimmer-card"></div>
+            <div class="skeleton-shimmer-card"></div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- =========================================================================
+           TAB 3: WIZARD / ANKETA (INTERACTIVE 5-STEP QUESTION FLOW)
+           ========================================================================= -->
+      <div class="tab-view" id="viewWizard">
+        <div class="wizard-page-wrap">
+          
+          <!-- Stepper Header -->
+          <div class="wizard-stepper-card">
+            <div class="stepper-top-meta">
+              <span class="stepper-badge" id="stepBadgeNum">1 / 5-qadam</span>
+              <h4 class="stepper-title-text" id="stepBadgeTitle">E'lon turini tanlang</h4>
+            </div>
+            <div class="stepper-orange-track">
+              <div class="stepper-orange-fill" id="stepFillBar" style="width: 20%;"></div>
+            </div>
+          </div>
+
+          <!-- Question Content Box -->
+          <div class="wizard-question-box">
+
+            <!-- STEP 1: Maqsad -->
+            <div class="w-step active" id="wStep1">
+              <div class="w-header">
+                <span class="w-emoji">🎯</span>
+                <h3 class="w-title">Sizning maqsadingiz nima?</h3>
+                <p class="w-desc">Kerakli bo'limni tanlang, e'loningizni tezda shakllantiramiz:</p>
+              </div>
+
+              <div class="w-choices-list">
+                <div class="w-choice-tile active" data-type="resume" id="tileResume">
+                  <div class="w-tile-icon res-grad">👩</div>
+                  <div class="w-tile-info">
+                    <div class="w-tile-head">
+                      <h4>Men xodimman (Anketa to'ldirish)</h4>
+                      <span class="w-tile-radio"></span>
+                    </div>
+                    <p>Farrosh yoki Enagaman. Diplom shart emas — anketangizni joylang va buyurtmalar oling!</p>
+                  </div>
+                </div>
+
+                <div class="w-choice-tile" data-type="vacancy" id="tileVacancy">
+                  <div class="w-tile-icon vac-grad">🏠</div>
+                  <div class="w-tile-info">
+                    <div class="w-tile-head">
+                      <h4>Menga xodim kerak (Buyurtma berish)</h4>
+                      <span class="w-tile-radio"></span>
+                    </div>
+                    <p>Xonadoningiz uchun ishonchli farrosh yoki mehrli enaga yollash</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 2: Kasb va Shaxsiy ma'lumotlar -->
+            <div class="w-step" id="wStep2">
+              <div class="w-header">
+                <span class="w-emoji">💼</span>
+                <h3 class="w-title" id="wizQ2Title">Kasb va Shaxsiy ma'lumotlar</h3>
+                <p class="w-desc" id="wizQ2Desc">Kasbingiz va yoshingizni kiriting:</p>
+              </div>
+
+              <div class="w-input-group">
+                <label class="w-label">Qaysi xizmat turini tanlaysiz? *</label>
+                <div class="wiz-gender-selector" id="wizProfSelector">
+                  <button type="button" class="wiz-gender-btn active" data-prof="Farrosh">
+                    <span>🧹</span> Farroshlik (Tozalik)
+                  </button>
+                  <button type="button" class="wiz-gender-btn" data-prof="Enaga">
+                    <span>👶</span> Enagalik (Bolalar qarovi)
+                  </button>
+                </div>
+              </div>
+
+              <div class="w-input-group">
+                <label class="w-label" id="wizLblJobTitle">Ism va familiyangiz *</label>
+                <input type="text" id="inputWizTitle" class="w-input" placeholder="Masalan: Dilnoza opa Karimova">
+              </div>
+
+              <div class="w-input-group" id="wizAgeGroup">
+                <label class="w-label" id="wizLblAge">Yoshingiz (Necha yoshdasiz?) *</label>
+                <input type="number" id="inputWizAge" class="w-input" min="18" max="75" placeholder="Masalan: 38" value="35">
+              </div>
+            </div>
+
+            <!-- STEP 3: Tuman va Ish tartibi -->
+            <div class="w-step" id="wStep3">
+              <div class="w-header">
+                <span class="w-emoji">📍</span>
+                <h3 class="w-title" id="wizQ3Title">Tuman va Ish tartibi</h3>
+                <p class="w-desc">Qaysi tumanda xizmat ko'rsatasiz yoki xodim kerak:</p>
+              </div>
+
+              <div class="w-input-group">
+                <label class="w-label">Yashash manzilingiz / Tumaningiz *</label>
+                <div class="w-select-wrap">
+                  <select id="inputWizRegion" class="w-select">
+                    <option value="" disabled selected>Tumanni tanlang</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="w-input-group">
+                <label class="w-label">Ish tartibini tanlang *</label>
+                <div class="wiz-gender-selector" id="wizWorkTypePills">
+                  <button type="button" class="wiz-gender-btn active" data-wtype="Kunlik (Bir martalik)">
+                    <span>⚡️</span> Kunlik
+                  </button>
+                  <button type="button" class="wiz-gender-btn" data-wtype="Oylik (Doimiy)">
+                    <span>📅</span> Oylik
+                  </button>
+                  <button type="button" class="wiz-gender-btn" data-wtype="Soatbay">
+                    <span>⏱</span> Soatbay
+                  </button>
+                  <button type="button" class="wiz-gender-btn" data-wtype="Yotib ishlash (Sutkalik)">
+                    <span>🏠</span> Yotib ishlash
+                  </button>
+                </div>
+              </div>
+
+              <div class="w-input-group">
+                <label class="w-label" id="wizLblSalary">Xizmat haqi / Narxi *</label>
+                <input type="text" id="inputWizSalary" class="w-input" placeholder="Masalan: 350 000 so'm / kuniga">
+                <div class="w-quick-chips">
+                  <button type="button" class="q-chip">300 000 so'm / kuniga</button>
+                  <button type="button" class="q-chip">4 000 000 so'm / oyiga</button>
+                  <button type="button" class="q-chip">50 000 so'm / soatiga</button>
+                  <button type="button" class="q-chip">Kelishilgan</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 4: Aloqa va Tavsif -->
+            <div class="w-step" id="wStep4">
+              <div class="w-header">
+                <span class="w-emoji">📞</span>
+                <h3 class="w-title">Aloqa va Tajribangiz</h3>
+                <p class="w-desc">Bog'lanish uchun telefon va o'zingiz haqingizda ma'lumot:</p>
+              </div>
+
+              <div class="w-input-row">
+                <div class="w-input-group half">
+                  <label class="w-label">Telefon raqam *</label>
+                  <input type="tel" id="inputWizPhone" class="w-input" placeholder="+998 90 123 45 67">
+                </div>
+                <div class="w-input-group half">
+                  <label class="w-label">Telegram (@username)</label>
+                  <input type="text" id="inputWizTelegram" class="w-input" placeholder="@username">
+                </div>
+              </div>
+
+              <div class="w-input-group">
+                <label class="w-label" id="wizLblDesc">O'zingiz va tajribangiz haqida ma'lumot</label>
+                <textarea id="inputWizDesc" class="w-textarea" rows="4" placeholder="Necha yil tajribangiz bor, uylarni tozalash, deraza yuvish yoki bolalar parvarishlashdagi fazilatlaringiz..."></textarea>
+              </div>
+            </div>
+
+            <!-- STEP 5: Live Card Preview -->
+            <div class="w-step" id="wStep5">
+              <div class="w-header">
+                <span class="w-emoji">✨</span>
+                <h3 class="w-title">E'loningiz tayyor!</h3>
+                <p class="w-desc">Ilovada e'loningiz quyidagi zamonaviy kartochka ko'rinishida chiqadi:</p>
+              </div>
+
+              <div class="w-preview-wrap">
+                <div class="ref-job-card preview-card-box" id="wizPreviewCard">
+                  <!-- JS to'ldiradi -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Wizard Navigation Bar -->
+          <div class="wizard-footer-nav">
+            <button type="button" class="btn-wiz-nav btn-wiz-back" id="btnWizBack" style="display: none;">
+              <span>← Ortga</span>
+            </button>
+            <button type="button" class="btn-wiz-nav btn-wiz-next" id="btnWizNext">
+              <span>Davom etish →</span>
+            </button>
+            <button type="button" class="btn-wiz-nav btn-wiz-submit" id="btnWizSubmit" style="display: none;">
+              <span>🚀 E'lonni joylash</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- =========================================================================
+           TAB 4: PROFILE / MENING PROFILIM
+           ========================================================================= -->
+      <div class="tab-view" id="viewProfile">
+        <div class="profile-page-wrap">
+          
+          <div class="profile-hero-card">
+            <div class="profile-avatar-large" id="profileAvatarWrap">
+              <img src="" alt="Profile" class="profile-avatar-img" id="profileUserAvatarImg" style="display: none;">
+              <div class="avatar-fallback large" id="profileAvatarFallback">A</div>
+            </div>
+            <h3 class="profile-name-text" id="profileCardName">Ali</h3>
+            <span class="profile-handle-text" id="profileCardHandle">@aliapisov</span>
+
+            <div class="profile-counters-row">
+              <div class="counter-box">
+                <span class="counter-num" id="profResCount">0</span>
+                <span class="counter-lbl">Anketalarim</span>
+              </div>
+              <div class="counter-sep"></div>
+              <div class="counter-box">
+                <span class="counter-num" id="profVacCount">0</span>
+                <span class="counter-lbl">Buyurtmalarim</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-section-title">
+            <h3>Siz joylagan e'lonlar</h3>
+          </div>
+
+          <div class="feed-cards-grid" id="myAdsGrid">
+            <div class="empty-state-box">
+              <span class="empty-icon">📂</span>
+              <p>Siz hali hech qanday e'lon bermagansiz.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- =========================================================================
+           FLOATING BOTTOM DOCK NAVIGATION (FARROSH & ENAGA FOCUSED)
+           ========================================================================= -->
+      <nav class="bottom-dock-nav">
+        <button class="dock-tab active" data-nav="home">
+          <svg class="dock-svg-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="dock-label">Asosiy</span>
+        </button>
+
+        <button class="dock-tab" data-nav="explore" data-prof="Farrosh">
+          <span style="font-size: 20px; line-height: 1;">🧹</span>
+          <span class="dock-label">Farrosh</span>
+        </button>
+
+        <button class="dock-tab center-create-tab" data-nav="wizard">
+          <div class="center-plus-btn">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <span class="dock-label">E'lon</span>
+        </button>
+
+        <button class="dock-tab" data-nav="explore" data-prof="Enaga">
+          <span style="font-size: 20px; line-height: 1;">👶</span>
+          <span class="dock-label">Enaga</span>
+        </button>
+
+        <button class="dock-tab" data-nav="profile">
+          <svg class="dock-svg-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="dock-label">Profil</span>
+        </button>
+      </nav>
+
+      <!-- =========================================================================
+           DETAIL SHEET MODAL (SCREEN 3 STYLE IN REFERENCE DESIGN)
+           ========================================================================= -->
+      <div class="sheet-modal-backdrop" id="detailSheetModal">
+        <div class="sheet-modal-card">
+          <div class="sheet-body-scroll" id="sheetDetailBody">
+            <!-- Dinamik JS to'ldiradi -->
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================================================================
+           REVIEW & STAR RATING MODAL (IZOH VA BAHOLASH)
+           ========================================================================= -->
+      <div class="review-modal-backdrop" id="reviewModal">
+        <div class="review-modal-card">
+          <div class="review-modal-top-bar">
+            <h3 class="review-modal-title">⭐ Izoh va Baho Qoldirish</h3>
+            <button class="review-modal-close-btn" id="closeReviewModalBtn">✕</button>
+          </div>
+          <p style="font-size: 13px; color: var(--text-gray); margin-bottom: 6px;">
+            Xodim: <strong id="modalWorkerNameText" style="color: var(--text-dark);">Dilnoza opa</strong>
+          </p>
+
+          <div class="star-picker-row" id="starPickerRow">
+            <button type="button" class="star-pick-btn active" data-rating="1">★</button>
+            <button type="button" class="star-pick-btn active" data-rating="2">★</button>
+            <button type="button" class="star-pick-btn active" data-rating="3">★</button>
+            <button type="button" class="star-pick-btn active" data-rating="4">★</button>
+            <button type="button" class="star-pick-btn active" data-rating="5">★</button>
+          </div>
+          <div class="review-score-label" id="reviewScoreLabel">A'lo (5 yulduz) ⭐⭐⭐⭐⭐</div>
+
+          <div class="w-input-group" style="margin-bottom: 12px;">
+            <label class="w-label">Ismingiz *</label>
+            <input type="text" id="inputReviewAuthor" class="w-input" placeholder="Ismingizni kiriting" value="Mijoz">
+          </div>
+
+          <div class="w-input-group" style="margin-bottom: 12px;">
+            <label class="w-label">Izohingiz (Xodimning ishi qanday bajarildi?) *</label>
+            <textarea id="inputReviewComment" class="w-textarea" rows="3" placeholder="Masalan: Uyni juda toza qilib berdi, chaqqon va halol ayol ekan. Rahmat!"></textarea>
+          </div>
+
+          <button type="button" class="review-submit-btn" id="btnSubmitReview">
+            <span>⭐ Bahoni yuborish</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Toast Feedback -->
+      <div class="toast-floating-pill" id="floatingToast"></div>
+
+    </div>
+  </div>
+
+  <script src="app.js?v=9.0"></script>
+</body>
+</html>

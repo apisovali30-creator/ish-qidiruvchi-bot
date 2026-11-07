@@ -1,0 +1,43 @@
+# Python Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Sensitive Environment Variables (NEVER COMMIT TO PUBLIC REPO)
+.env
+.env.local
+.env.*.local
+
+# SQLite Database (Real user data)
+*.db
+*.sqlite
+*.sqlite3
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE & Editor Configs
+.vscode/
+.idea/
+*.swp
+*.swo

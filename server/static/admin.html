@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oqila | Google Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin.css">
+  <!-- Google Identity Services SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+  <!-- ==================== 1. GOOGLE LOGIN OVERLAY ==================== -->
+  <div id="loginOverlay" class="login-overlay active">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="brand-logo-icon">👑</div>
+        <h1 class="brand-title">Oqila Admin</h1>
+        <p class="brand-subtitle">Farrosh va Enaga xizmatlari boshqaruv tizimi</p>
+      </div>
+
+      <div class="login-auth-box">
+        <div class="auth-notice-pill">
+          <span class="lock-icon">🔒</span>
+          <span>Faqat vakolatli Google hisob: <b>aliapisov11@gmail.com</b></span>
+        </div>
+
+        <!-- Google Official One-Tap / Button Container -->
+        <div id="g_id_onload"></div>
+        <div id="googleBtnContainer" class="google-btn-wrapper"></div>
+
+        <div class="login-divider">
+          <span>yoki xavfsiz kalit orqali</span>
+        </div>
+
+        <form id="quickLoginForm" class="quick-login-form">
+          <div class="form-group">
+            <label for="adminEmailInput">Google Pochta</label>
+            <input type="email" id="adminEmailInput" value="aliapisov11@gmail.com" required readonly class="readonly-input">
+          </div>
+          <div class="form-group">
+            <label for="adminKeyInput">Admin Maxfiy Kaliti</label>
+            <input type="password" id="adminKeyInput" placeholder="Maxfiy kalitni kiriting..." required autocomplete="current-password">
+          </div>
+          <button type="submit" id="btnQuickLogin" class="btn-primary-admin">
+            <span>🚀 Tizimga kirish</span>
+          </button>
+        </form>
+
+        <div id="loginErrorMsg" class="login-error-alert" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. ADMIN DASHBOARD SHELL ==================== -->
+  <div id="adminApp" class="admin-shell" style="display: none;">
+    
+    <!-- Top Header -->
+    <header class="admin-header">
+      <div class="header-left">
+        <div class="admin-logo-mark">✨</div>
+        <div class="header-titles">
+          <h2 class="header-app-name">Oqila Boshqaruv Markazi</h2>
+          <span class="header-badge-tag">Google Admin</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="admin-user-pill">
+          <img id="adminAvatarImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Admin" class="admin-avatar">
+          <div class="admin-user-info">
+            <div id="adminUserName" class="admin-name">Ali (Admin)</div>
+            <div id="adminUserEmail" class="admin-email-text">aliapisov11@gmail.com</div>
+          </div>
+        </div>
+        <button id="btnLogout" class="btn-logout" title="Chiqish">
+          <span>🚪 Chiqish</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="admin-nav-bar">
+      <div class="nav-container">
+        <button class="admin-nav-btn active" data-tab="tabStats">
+          <span class="nav-icon">📊</span>
+          <span>Umumiy Statistika</span>
+        </button>
+        <button class="admin-nav-btn" data-tab="tabResumes">
+          <span class="nav-icon">👩</span>
+          <span>Nomzodlar (Farrosh & Enaga)</span>
+          <span id="badgeResumesCount" class="nav-count-badge">0</span>
+        </button>
+        <button class="admin-nav-btn" data-tab="tabVacancies">
+          <span class="nav-icon">📋</span>
+          <span>Buyurtmalar (Vakansiyalar)</span>
+          <span id="badgeVacanciesCount" class="nav-count-badge">0</span>
+        </button>
+        <button class="admin-nav-btn" data-tab="tabReviews">
+          <span class="nav-icon">⭐</span>
+          <span>Mijozlar Sharhlari</span>
+          <span id="badgeReviewsCount" class="nav-count-badge">0</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="admin-main-body">
+
+      <!-- TAB 1: STATS -->
+      <section id="tabStats" class="admin-tab-section active">
+        <div class="section-top-bar">
+          <div>
+            <h3 class="section-title">Umumiy ko'rsatkichlar</h3>
+            <p class="section-desc">Platformadagi barcha nomzodlar, buyurtmalar va mijoz sharhlari holati</p>
+          </div>
+          <button id="btnRefreshStats" class="btn-refresh">🔄 Yangilash</button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card orange-glow">
+            <div class="stat-top">
+              <span class="stat-icon">🧹</span>
+              <span class="stat-label">Farroshlar</span>
+            </div>
+            <div id="statFarroshCount" class="stat-number">0</div>
+            <div class="stat-footer">Tozalik sohasidagi ayollar</div>
+          </div>
+
+          <div class="stat-card yellow-glow">
+            <div class="stat-top">
+              <span class="stat-icon">👶</span>
+              <span class="stat-label">Enagalar</span>
+            </div>
+            <div id="statEnagaCount" class="stat-number">0</div>
+            <div class="stat-footer">Bolalar parvarishi xodimlari</div>
+          </div>
+
+          <div class="stat-card green-glow">
+            <div class="stat-top">
+              <span class="stat-icon">📋</span>
+              <span class="stat-label">Buyurtmalar</span>
+            </div>
+            <div id="statVacanciesCount" class="stat-number">0</div>
+            <div class="stat-footer">Mijozlar bergan ish e'lonlari</div>
+          </div>
+
+          <div class="stat-card purple-glow">
+            <div class="stat-top">
+              <span class="stat-icon">⭐</span>
+              <span class="stat-label">O'rtacha Reyting</span>
+            </div>
+            <div id="statAvgRating" class="stat-number">5.0</div>
+            <div id="statReviewsCount" class="stat-footer">0 ta haqiqiy mijoz izohlari</div>
+          </div>
+        </div>
+
+        <!-- Quick Summary Box -->
+        <div class="summary-banner-card">
+          <div class="banner-left">
+            <h4 class="banner-heading">Telegram Mini App faol ishlamoqda</h4>
+            <p class="banner-text">Mijozlar Telegram bot orqali real vaqtda yangi buyurtmalar berishi va ishni tugatgach sharh qoldirishi mumkin.</p>
+          </div>
+          <a href="/" target="_blank" class="btn-visit-app">
+            <span>📱 Ilovani brauzerda ochish</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- TAB 2: RESUMES (NOMZODLAR) -->
+      <section id="tabResumes" class="admin-tab-section">
+        <div class="section-top-bar">
+          <div>
+            <h3 class="section-title">Nomzodlar Anketalari</h3>
+            <p class="section-desc">Farrosh va Enaga ayollar anketalarini moderatsiya qilish, holatini o'zgartirish yoki o'chirish</p>
+          </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="filter-controls-row">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="resumeSearchInput" placeholder="Ism, tuman, telefon yoki tajriba bo'yicha qidirish...">
+          </div>
+          <div class="filter-selects">
+            <select id="resumeProfessionFilter" class="admin-select">
+              <option value="">Barcha kasblar</option>
+              <option value="Farrosh">🧹 Faqat Farroshlar</option>
+              <option value="Enaga">👶 Faqat Enagalar</option>
+            </select>
+            <select id="resumeStatusFilter" class="admin-select">
+              <option value="">Barcha statuslar</option>
+              <option value="1">🟢 Faol e'lonlar</option>
+              <option value="0">⚪️ Yashirilganlar</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Resumes Table -->
+        <div class="data-table-card">
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Nomzod</th>
+                  <th>Kasb</th>
+                  <th>Yoshi & Tuman</th>
+                  <th>Ish tartibi & Narxi</th>
+                  <th>Telefon</th>
+                  <th>Reyting</th>
+                  <th>Holati</th>
+                  <th style="text-align: right;">Amallar</th>
+                </tr>
+              </thead>
+              <tbody id="resumesTableBody">
+                <tr><td colspan="8" class="empty-cell">Yuklanmoqda...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: VACANCIES (BUYURTMALAR) -->
+      <section id="tabVacancies" class="admin-tab-section">
+        <div class="section-top-bar">
+          <div>
+            <h3 class="section-title">Mijozlar Buyurtmalari</h3>
+            <p class="section-desc">Xonadon egalari tomonidan berilgan tozalash va bola parvarishi bo'yicha buyurtmalar</p>
+          </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="filter-controls-row">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="vacancySearchInput" placeholder="Buyurtma nomi, tuman yoki telefon bo'yicha qidirish...">
+          </div>
+          <div class="filter-selects">
+            <select id="vacancyStatusFilter" class="admin-select">
+              <option value="">Barcha statuslar</option>
+              <option value="1">🟢 Ochiq buyurtmalar</option>
+              <option value="0">⚪️ Yopilganlar</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Vacancies Table -->
+        <div class="data-table-card">
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Buyurtma Nomi</th>
+                  <th>Talab qilingan kasb</th>
+                  <th>Tuman</th>
+                  <th>Taklif qilingan haq</th>
+                  <th>Telefon & Telegram</th>
+                  <th>Holati</th>
+                  <th style="text-align: right;">Amallar</th>
+                </tr>
+              </thead>
+              <tbody id="vacanciesTableBody">
+                <tr><td colspan="7" class="empty-cell">Yuklanmoqda...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: REVIEWS (SHARHLAR) -->
+      <section id="tabReviews" class="admin-tab-section">
+        <div class="section-top-bar">
+          <div>
+            <h3 class="section-title">Mijozlar Sharhlari va Izohlari</h3>
+            <p class="section-desc">Ish bitgandan keyin qoldirilgan barcha baholar. Noo'rin yoki haqoratli izohlarni o'chirish mumkin.</p>
+          </div>
+        </div>
+
+        <!-- Reviews Grid -->
+        <div id="reviewsListGrid" class="reviews-admin-grid">
+          <div class="empty-placeholder">Yuklanmoqda...</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="adminToast" class="admin-toast"></div>
+
+  <script src="/admin.js"></script>
+</body>
+</html>
