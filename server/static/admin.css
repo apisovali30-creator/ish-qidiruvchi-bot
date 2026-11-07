@@ -811,3 +811,85 @@ body {
   .stats-grid { grid-template-columns: 1fr; }
   .filter-controls-row { flex-direction: column; }
 }
+
+/* ==================== LIVE AUTO-REFRESH & BUSY STATUS STYLES ==================== */
+
+.live-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #16A34A;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 11px;
+  border-radius: var(--radius-full);
+  margin-left: 8px;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #16A34A;
+  display: inline-block;
+}
+
+.live-dot.pulse {
+  animation: livePulse 2s infinite ease-in-out;
+}
+
+@keyframes livePulse {
+  0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+  70% { transform: scale(1.15); box-shadow: 0 0 0 7px rgba(22, 163, 74, 0); }
+  100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+}
+
+.badge-busy-admin {
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
+  border: 1px solid #FECACA !important;
+  font-weight: 800 !important;
+}
+
+.badge-available-admin {
+  background: #ECFDF5 !important;
+  color: #059669 !important;
+  border: 1px solid #D1FAE5 !important;
+  font-weight: 800 !important;
+}
+
+.btn-action-busy {
+  font-weight: 700;
+}
+
+.btn-action-busy.is-busy {
+  color: #059669;
+  border-color: #A7F3D0;
+  background: #F0FDF4;
+}
+
+.btn-action-busy.is-busy:hover {
+  background: #DCFCE7;
+}
+
+.btn-action-busy.is-available {
+  color: #DC2626;
+  border-color: #FECACA;
+  background: #FFF1F2;
+}
+
+.btn-action-busy.is-available:hover {
+  background: #FEE2E2;
+}
+
+@keyframes highlightNewRow {
+  0% { background-color: #FEF3C7; }
+  100% { background-color: transparent; }
+}
+
+.row-highlight-new {
+  animation: highlightNewRow 3s ease-out;
+}
+

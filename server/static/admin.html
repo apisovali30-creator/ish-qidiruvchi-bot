@@ -65,6 +65,10 @@
         <div class="header-titles">
           <h2 class="header-app-name">Oqila Boshqaruv Markazi</h2>
           <span class="header-badge-tag">Google Admin</span>
+          <div class="live-status-pill" title="Yangi e'lonlar avtomatik real-vaqt rejimida yangilanadi">
+            <span class="live-dot pulse"></span>
+            <span class="live-text">Jonli efir (Avto)</span>
+          </div>
         </div>
       </div>
 
@@ -191,6 +195,11 @@
               <option value="Farrosh">🧹 Faqat Farroshlar</option>
               <option value="Enaga">👶 Faqat Enagalar</option>
             </select>
+            <select id="resumeBusyFilter" class="admin-select">
+              <option value="">Barcha bandlik holatlari</option>
+              <option value="0">🟢 Faqat Bo'shlar</option>
+              <option value="1">🔴 Faqat Bandlar</option>
+            </select>
             <select id="resumeStatusFilter" class="admin-select">
               <option value="">Barcha statuslar</option>
               <option value="1">🟢 Faol e'lonlar</option>
@@ -211,12 +220,13 @@
                   <th>Ish tartibi & Narxi</th>
                   <th>Telefon</th>
                   <th>Reyting</th>
+                  <th>Bandlik</th>
                   <th>Holati</th>
                   <th style="text-align: right;">Amallar</th>
                 </tr>
               </thead>
               <tbody id="resumesTableBody">
-                <tr><td colspan="8" class="empty-cell">Yuklanmoqda...</td></tr>
+                <tr><td colspan="9" class="empty-cell">Yuklanmoqda...</td></tr>
               </tbody>
             </table>
           </div>

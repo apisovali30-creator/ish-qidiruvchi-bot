@@ -415,7 +415,8 @@ async def get_admin_stats() -> Dict[str, Any]:
 async def get_all_resumes_admin(
     search: Optional[str] = None,
     profession: Optional[str] = None,
-    is_active: Optional[int] = None
+    is_active: Optional[int] = None,
+    is_busy: Optional[int] = None
 ) -> List[Dict[str, Any]]:
     async with get_db() as db:
         query = "SELECT * FROM resumes WHERE 1=1"
@@ -427,6 +428,9 @@ async def get_all_resumes_admin(
         if is_active is not None:
             query += " AND is_active = ?"
             params.append(is_active)
+        if is_busy is not None:
+            query += " AND is_busy = ?"
+            params.append(is_busy)
         if search:
             query += " AND (full_name LIKE ? OR district LIKE ? OR bio LIKE ? OR phone LIKE ?)"
             s = f"%{search}%"
@@ -436,6 +440,14 @@ async def get_all_resumes_admin(
         async with db.execute(query, params) as cursor:
             rows = await cursor.fetchall()
             return [dict(r) for r in rows]
+
+async def admin_toggle_resume_busy(resume_id: int) -> int:
+    async with get_db() as db:
+        await db.execute("UPDATE resumes SET is_busy = CASE WHEN is_busy = 1 THEN 0 ELSE 1 END WHERE id = ?", (resume_id,))
+        await db.commit()
+        async with db.execute("SELECT is_busy FROM resumes WHERE id = ?", (resume_id,)) as cursor:
+            row = await cursor.fetchone()
+            return int(row["is_busy"]) if row else 0
 
 async def toggle_resume_status(resume_id: int, is_active: Optional[int] = None) -> bool:
     async with get_db() as db:

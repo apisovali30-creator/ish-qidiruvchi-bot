@@ -466,10 +466,22 @@ async def admin_get_resumes(
     search: Optional[str] = None,
     profession: Optional[str] = None,
     is_active: Optional[int] = None,
+    is_busy: Optional[int] = None,
     admin: Dict[str, Any] = Depends(get_current_admin)
 ):
-    items = await db.get_all_resumes_admin(search=search, profession=profession, is_active=is_active)
+    items = await db.get_all_resumes_admin(
+        search=search,
+        profession=profession,
+        is_active=is_active,
+        is_busy=is_busy
+    )
     return {"status": "ok", "data": items, "count": len(items)}
+
+@app.patch("/api/admin/resumes/{item_id}/busy")
+async def admin_toggle_resume_busy_endpoint(item_id: int, admin: Dict[str, Any] = Depends(get_current_admin)):
+    new_status = await db.admin_toggle_resume_busy(item_id)
+    status_text = "Band" if new_status == 1 else "Bo'sh"
+    return {"status": "ok", "is_busy": new_status, "message": f"Nomzod #{item_id} holati '{status_text}' deb belgilandi"}
 
 @app.patch("/api/admin/resumes/{item_id}/toggle")
 async def admin_toggle_resume(item_id: int, admin: Dict[str, Any] = Depends(get_current_admin)):
