@@ -79,6 +79,10 @@ class ReviewCreate(BaseModel):
     rating: int = Field(..., ge=1, le=5)
     comment: str = Field(..., min_length=3, max_length=1000)
 
+class ResumeBusyToggle(BaseModel):
+    user_id: int
+    is_busy: int  # 0 = Bo'sh, 1 = Band
+
 @app.on_event("startup")
 async def on_startup():
     await db.init_db()
@@ -234,6 +238,22 @@ async def create_resume(payload: ResumeCreate):
     await notify_user(payload.user_id, notification_msg)
 
     return {"status": "ok", "id": resume_id, "message": "Anketa muvaffaqiyatli yaratildi"}
+
+@app.patch("/api/resumes/{resume_id}/busy")
+async def toggle_worker_busy(resume_id: int, payload: ResumeBusyToggle):
+    success = await db.set_resume_busy_status(
+        resume_id=resume_id,
+        user_id=payload.user_id,
+        is_busy=payload.is_busy
+    )
+    if not success:
+        raise HTTPException(status_code=403, detail="Anketa topilmadi yoki sizda uni o'zgartirish huquqi yo'q")
+    status_text = "Band" if payload.is_busy == 1 else "Bo'sh"
+    return {
+        "status": "ok",
+        "is_busy": payload.is_busy,
+        "message": f"Holatingiz '{status_text}' deb belgilandi"
+    }
 
 # --- Reviews Endpoints (Baho va Izohlar) ---
 

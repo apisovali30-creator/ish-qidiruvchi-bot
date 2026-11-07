@@ -50,6 +50,7 @@ async def init_db() -> None:
                 bio TEXT,
                 avg_rating REAL DEFAULT 5.0,
                 reviews_count INTEGER DEFAULT 0,
+                is_busy INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 is_active INTEGER DEFAULT 1
             )
@@ -98,6 +99,8 @@ async def init_db() -> None:
                 await db.execute("ALTER TABLE resumes ADD COLUMN avg_rating REAL DEFAULT 5.0")
             if "reviews_count" not in res_cols:
                 await db.execute("ALTER TABLE resumes ADD COLUMN reviews_count INTEGER DEFAULT 0")
+            if "is_busy" not in res_cols:
+                await db.execute("ALTER TABLE resumes ADD COLUMN is_busy INTEGER DEFAULT 0")
 
         # Indexes for speed
         await db.execute("CREATE INDEX IF NOT EXISTS idx_vacancies_profession ON vacancies(profession)")
@@ -295,6 +298,16 @@ async def delete_resume(resume_id: int, user_id: Optional[int] = None) -> bool:
             cursor = await db.execute("UPDATE resumes SET is_active = 0 WHERE id = ? AND user_id = ?", (resume_id, user_id))
         else:
             cursor = await db.execute("UPDATE resumes SET is_active = 0 WHERE id = ?", (resume_id,))
+        await db.commit()
+        return cursor.rowcount > 0
+
+async def set_resume_busy_status(resume_id: int, user_id: int, is_busy: int) -> bool:
+    async with get_db() as db:
+        cursor = await db.execute("""
+            UPDATE resumes 
+            SET is_busy = ? 
+            WHERE id = ? AND user_id = ?
+        """, (int(is_busy), resume_id, user_id))
         await db.commit()
         return cursor.rowcount > 0
 

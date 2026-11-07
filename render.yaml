@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: ish-qidiruvchi-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run.py
+    plan: free
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_EMAIL
+        value: aliapisov11@gmail.com
+      - key: ADMIN_SECRET_KEY
+        generateValue: true
+      - key: WEBAPP_URL
+        sync: false

@@ -281,14 +281,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isWorker) {
       const avgRating = Number(item.avg_rating || 5.0).toFixed(1);
       const revCount = item.reviews_count || 0;
+      const isBusy = Number(item.is_busy) === 1;
+      const busyBadge = isBusy 
+        ? `<span class="card-rating-badge badge-busy">🔴 Band</span>`
+        : `<span class="card-rating-badge badge-available">🟢 Bo'sh</span>`;
+
       badgeHtml = `
         <span class="card-category-badge">${prof === 'Enaga' ? '👶 Enaga' : '🧹 Farrosh'}</span>
-        <span class="card-rating-badge">⭐ ${avgRating} (${revCount})</span>
+        ${busyBadge}
       `;
       tagsHtml = `
         <div class="card-tags-row">
           <span class="card-age-tag">🎂 ${item.age || 35} yosh</span>
           <span class="card-district-tag">📍 ${escapeHtml(districtText)}</span>
+          <span class="card-age-tag" style="background:#FFFBEB;color:#B45309;font-weight:700;">⭐ ${avgRating} (${revCount})</span>
         </div>
       `;
     } else {
@@ -459,9 +465,52 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     allMy.forEach(item => {
-      myAdsGrid.appendChild(createCard(item._type, item));
+      const card = createCard(item._type, item);
+      if (item._type === 'resume') {
+        const isBusy = Number(item.is_busy) === 1;
+        const busyBox = document.createElement("div");
+        busyBox.className = "my-busy-control-box";
+        busyBox.innerHTML = `
+          <div class="my-busy-status-label ${isBusy ? 'is-busy' : 'is-available'}">
+            <span>${isBusy ? '🔴 Hozirda Bandsiz' : '🟢 Hozirda Bo\'shsiz'}</span>
+          </div>
+          <button class="btn-toggle-busy ${isBusy ? 'btn-make-available' : 'btn-make-busy'}" onclick="event.stopPropagation(); window.toggleMyBusy(${item.id}, ${isBusy ? 1 : 0})">
+            ${isBusy ? '🟢 Bo\'sh deb belgilash' : '🔴 Band deb belgilash'}
+          </button>
+        `;
+        card.querySelector('.card-body-wrap')?.appendChild(busyBox);
+      }
+      myAdsGrid.appendChild(card);
     });
   }
+
+  // Window helper for toggling busy status
+  window.toggleMyBusy = async function(resumeId, currentBusy) {
+    hapticImpact();
+    const newBusy = currentBusy === 1 ? 0 : 1;
+    try {
+      const res = await fetch(`/api/resumes/${resumeId}/busy`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: tgUser.id,
+          is_busy: newBusy
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(data.message || "Holatingiz yangilandi!");
+        await loadMyPosts();
+        await loadFeaturedWorkers();
+        await loadResumes();
+      } else {
+        showToast(data.detail || "Xatolik yuz berdi", "error");
+      }
+    } catch (err) {
+      console.error("toggleMyBusy error:", err);
+      showToast("Server bilan aloqa uzildi", "error");
+    }
+  };
 
   // --- DETAIL SHEET MODAL (WITH RATINGS & REVIEWS) ---
   async function openDetailSheet(type, item) {
@@ -559,17 +608,39 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="sheet-fee-bold-amount">${escapeHtml(salary)}</span>
         </div>
 
-        <a href="tel:${escapeHtml(item.phone)}" class="sheet-giant-orange-cta" onclick="hapticImpact()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          <span>Bog'lanish (${escapeHtml(item.phone)})</span>
-        </a>
+        ${(() => {
+          const isBusy = isWorker && Number(item.is_busy) === 1;
+          if (isBusy) {
+            return `
+              <div class="worker-busy-alert-box">
+                <span class="worker-busy-alert-icon">⏳</span>
+                <div>
+                  <div class="worker-busy-alert-title">Xodim ayni vaqtda band</div>
+                  <div class="worker-busy-alert-text">Ushbu mutaxassis hozirda boshqa xonadonda ishlayapti yoki yangi buyurtma qabul qilmaydi. U bo'shagach yana aloqa qilish mumkin bo'ladi.</div>
+                </div>
+              </div>
+              <div class="sheet-giant-orange-cta btn-disabled-busy">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span>Xodim band (Aloqa vaqtincha yopiq)</span>
+              </div>
+              <div class="busy-disabled-note">Ish paytida xodimni bezovta qilib bo'lmaydi</div>
+            `;
+          } else {
+            return `
+              <a href="tel:${escapeHtml(item.phone)}" class="sheet-giant-orange-cta" onclick="hapticImpact()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span>Bog'lanish (${escapeHtml(item.phone)})</span>
+              </a>
 
-        ${item.telegram ? `
-          <a href="https://t.me/${item.telegram.replace('@', '')}" target="_blank" class="sheet-tg-cta" onclick="hapticImpact()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            <span>Telegram orqali yozish</span>
-          </a>
-        ` : ""}
+              ${item.telegram ? `
+                <a href="https://t.me/${item.telegram.replace('@', '')}" target="_blank" class="sheet-tg-cta" onclick="hapticImpact()">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  <span>Telegram orqali yozish</span>
+                </a>
+              ` : ""}
+            `;
+          }
+        })()}
 
         ${reviewsSectionHtml}
       </div>

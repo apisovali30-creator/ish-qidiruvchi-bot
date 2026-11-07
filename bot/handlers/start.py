@@ -10,93 +10,80 @@ from aiogram.types import (
     WebAppInfo,
     MenuButtonWebApp
 )
-from config import get_webapp_url, ADMIN_IDS
+from config import get_webapp_url
 
 logger = logging.getLogger(__name__)
 router = Router()
 
-def get_start_inline_keyboard(is_admin: bool = False) -> InlineKeyboardMarkup:
+def get_start_inline_keyboard() -> InlineKeyboardMarkup:
     url = get_webapp_url()
     
-    keyboard = []
     if url.startswith("https://"):
-        keyboard.append([
-            InlineKeyboardButton(
-                text="🚀 Ilovani ochish (Mini App)",
-                web_app=WebAppInfo(url=url)
-            )
-        ])
-        keyboard.append([
-            InlineKeyboardButton(
-                text="🧹 Farroshlar",
-                web_app=WebAppInfo(url=f"{url}#farrosh")
-            ),
-            InlineKeyboardButton(
-                text="👶 Enagalar",
-                web_app=WebAppInfo(url=f"{url}#enaga")
-            )
-        ])
-        keyboard.append([
-            InlineKeyboardButton(
-                text="➕ Anketa / E'lon berish",
-                web_app=WebAppInfo(url=f"{url}#create")
-            )
-        ])
-        if is_admin:
-            keyboard.append([
-                InlineKeyboardButton(
-                    text="👑 Admin Panelni ochish",
-                    url=f"{url}/admin"
-                )
-            ])
+        return InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="🚀 Ilovani ochish (Mini App)",
+                        web_app=WebAppInfo(url=url)
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="🧹 Farroshlar",
+                        web_app=WebAppInfo(url=f"{url}#farrosh")
+                    ),
+                    InlineKeyboardButton(
+                        text="👶 Enagalar",
+                        web_app=WebAppInfo(url=f"{url}#enaga")
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="➕ Anketa / E'lon berish",
+                        web_app=WebAppInfo(url=f"{url}#create")
+                    )
+                ]
+            ]
+        )
     else:
-        keyboard.append([
-            InlineKeyboardButton(
-                text="🌐 Ilovani brauzerda ochish",
-                url=url
-            )
-        ])
-        if is_admin:
-            keyboard.append([
-                InlineKeyboardButton(
-                    text="👑 Admin Panel",
-                    url=f"{url}/admin"
-                )
-            ])
-            
-    return InlineKeyboardMarkup(inline_keyboard=keyboard)
+        return InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="🌐 Ilovani brauzerda ochish",
+                        url=url
+                    )
+                ]
+            ]
+        )
 
-def get_start_reply_keyboard(is_admin: bool = False) -> ReplyKeyboardMarkup:
+def get_start_reply_keyboard() -> ReplyKeyboardMarkup:
     url = get_webapp_url()
     
-    keyboard = []
     if url.startswith("https://"):
-        keyboard.append([
-            KeyboardButton(
-                text="📱 Platformani ochish",
-                web_app=WebAppInfo(url=url)
-            )
-        ])
-        if is_admin:
-            keyboard.append([
-                KeyboardButton(
-                    text="👑 Admin Panel",
-                    web_app=WebAppInfo(url=f"{url}/admin")
-                )
-            ])
-        keyboard.append([
-            KeyboardButton(text="ℹ️ Bot va Ilova haqida")
-        ])
+        return ReplyKeyboardMarkup(
+            keyboard=[
+                [
+                    KeyboardButton(
+                        text="📱 Platformani ochish",
+                        web_app=WebAppInfo(url=url)
+                    )
+                ],
+                [
+                    KeyboardButton(text="ℹ️ Bot va Ilova haqida")
+                ]
+            ],
+            resize_keyboard=True
+        )
     else:
-        if is_admin:
-            keyboard.append([
-                KeyboardButton(text="👑 Admin Panel")
-            ])
-        keyboard.append([
-            KeyboardButton(text="ℹ️ Bot va Ilova haqida")
-        ])
-
-    return ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True)
+        return ReplyKeyboardMarkup(
+            keyboard=[
+                [
+                    KeyboardButton(text="ℹ️ Bot va Ilova haqida")
+                ]
+            ],
+            resize_keyboard=True
+        )
 
 @router.message(CommandStart())
 async def handle_start(message: Message) -> None:
@@ -142,16 +129,14 @@ async def handle_start(message: Message) -> None:
         f"Quyidagi <b>'🚀 Ilovani ochish'</b> tugmasini bosing yoki chat burchagidagi <b>'Open'</b> tugmasidan foydalaning!"
     )
 
-    is_admin = bool(message.from_user and message.from_user.id in ADMIN_IDS)
-
     try:
         await message.answer(
             text=text,
-            reply_markup=get_start_inline_keyboard(is_admin=is_admin)
+            reply_markup=get_start_inline_keyboard()
         )
         await message.answer(
             "Xabar yozish qatori yonidagi <b>'Open'</b> tugmasi yoki quyidagi doimiy menyu orqali ham ilovani ochishingiz mumkin 👇",
-            reply_markup=get_start_reply_keyboard(is_admin=is_admin)
+            reply_markup=get_start_reply_keyboard()
         )
     except Exception as e:
         logger.error(f"Xabar yuborishda xatolik: {e}")
@@ -178,33 +163,6 @@ async def handle_help(message: Message) -> None:
     except Exception as e:
         logger.error(f"Yordam yuborishda xatolik: {e}")
         await message.answer(text=help_text)
-
-@router.message(Command("admin"))
-@router.message(F.text == "👑 Admin Panel")
-async def handle_admin_command(message: Message) -> None:
-    user_id = message.from_user.id if message.from_user else 0
-    if user_id not in ADMIN_IDS:
-        await message.answer("⛔️ Kechirasiz, sizda admin huquqlari mavjud emas.")
-        return
-
-    url = get_webapp_url()
-    admin_url = f"{url}/admin"
-    kb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="👑 Admin Panelni ochish",
-                    url=admin_url
-                )
-            ]
-        ]
-    )
-    await message.answer(
-        "👑 <b>Hurmatli Admin!</b>\n\n"
-        "Farrosh va Enaga platformasi boshqaruv panelini ochish uchun quyidagi tugmani bosing.\n"
-        "Faqat sizning Google hisobingiz (<b>aliapisov11@gmail.com</b>) orqali kirish mumkin.",
-        reply_markup=kb
-    )
 
 # Har qanday boshqa matnli xabar kelganda ham yo'naltirish
 @router.message(F.text)

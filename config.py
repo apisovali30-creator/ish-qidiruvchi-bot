@@ -12,7 +12,7 @@ reload_config()
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 WEBAPP_URL = os.getenv("WEBAPP_URL", "https://pretty-eggs-build.loca.lt")
 SERVER_HOST = os.getenv("SERVER_HOST", "0.0.0.0")
-SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
+SERVER_PORT = int(os.getenv("PORT", os.getenv("SERVER_PORT", "8000")))
 
 # Admin Panel sozlamalari (Faqat ruxsat berilgan Google hisob)
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "aliapisov11@gmail.com")
