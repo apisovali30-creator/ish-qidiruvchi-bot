@@ -2,7 +2,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
-from config import BOT_TOKEN
+from config import BOT_TOKEN, ADMIN_IDS
 
 logger = logging.getLogger(__name__)
 
@@ -29,3 +29,15 @@ async def notify_user(user_id: int, message_text: str) -> bool:
     except Exception as e:
         logger.error(f"Foydalanuvchiga xabar yuborishda xatolik ({user_id}): {e}")
         return False
+
+async def notify_admins(message_text: str) -> None:
+    """Barcha adminlarga (shu jumladan 5150570662) bot orqali tezkor bildirishnoma yuborish."""
+    try:
+        current_bot = get_bot()
+        for admin_id in ADMIN_IDS:
+            try:
+                await current_bot.send_message(chat_id=admin_id, text=message_text)
+            except Exception as e:
+                logger.warning(f"Adminga ({admin_id}) xabar yuborishda xatolik: {e}")
+    except Exception as e:
+        logger.error(f"Adminlarga xabar yuborishda umumiy xatolik: {e}")

@@ -15,7 +15,7 @@ from config import (
     ADMIN_EMAIL, ADMIN_SECRET_KEY, GOOGLE_CLIENT_ID
 )
 import database.db as db
-from bot.bot_instance import notify_user
+from bot.bot_instance import notify_user, notify_admins
 
 app = FastAPI(title="Farrosh va Enaga Xizmati Mini App API", version="3.0.0")
 
@@ -164,6 +164,16 @@ async def create_vacancy(payload: VacancyCreate):
     )
     await notify_user(payload.user_id, notification_msg)
 
+    admin_alert = (
+        f"🔔 <b>Yangi mijoz buyurtmasi keldi!</b> (#ID: {vacancy_id})\n\n"
+        f"💼 <b>Kasb:</b> {prof}\n"
+        f"📍 <b>Tuman:</b> {dist}\n"
+        f"⏰ <b>Ish tartibi:</b> {wtype}\n"
+        f"💰 <b>Taklif etilgan haq:</b> {payload.salary}\n"
+        f"📞 <b>Telefon:</b> {payload.phone or 'Kiritilmagan'}"
+    )
+    await notify_admins(admin_alert)
+
     return {"status": "ok", "id": vacancy_id, "message": "Buyurtma muvaffaqiyatli yaratildi"}
 
 # --- Resumes Endpoints (Enaga va Farrosh ayollar anketalari) ---
@@ -237,6 +247,18 @@ async def create_resume(payload: ResumeCreate):
     )
     await notify_user(payload.user_id, notification_msg)
 
+    admin_alert = (
+        f"🔔 <b>Yangi nomzod anketasi qo'shildi!</b> (#ID: {resume_id})\n\n"
+        f"👤 <b>Nomzod:</b> {payload.full_name}\n"
+        f"💼 <b>Kasb:</b> {prof}\n"
+        f"🎂 <b>Yoshi:</b> {payload.age} yoshda\n"
+        f"📍 <b>Tuman:</b> {dist}\n"
+        f"⏰ <b>Ish tartibi:</b> {wtype}\n"
+        f"💰 <b>Kutilayotgan haq:</b> {salary_display}\n"
+        f"📞 <b>Telefon:</b> {payload.phone}"
+    )
+    await notify_admins(admin_alert)
+
     return {"status": "ok", "id": resume_id, "message": "Anketa muvaffaqiyatli yaratildi"}
 
 @app.patch("/api/resumes/{resume_id}/busy")
@@ -287,6 +309,15 @@ async def create_review(payload: ReviewCreate):
             f"Umumiy reytingingiz: <b>⭐ {res['avg_rating']}</b> ({res['reviews_count']} ta izoh)"
         )
         await notify_user(worker["user_id"], worker_msg)
+
+    admin_review_alert = (
+        f"⭐ <b>Yangi mijoz sharhi va baho qoldirildi!</b>\n\n"
+        f"👩 <b>Xodim:</b> {worker.get('full_name', 'Xodim')} (#{payload.worker_id})\n"
+        f"⭐️ <b>Baho:</b> {'⭐' * payload.rating} ({payload.rating}/5)\n"
+        f"💬 <b>Izoh:</b> <i>\"{payload.comment or 'Izohsiz'}\"</i>\n"
+        f"👤 <b>Mijoz:</b> {payload.author_name}"
+    )
+    await notify_admins(admin_review_alert)
 
     return {"status": "ok", "data": res, "message": "Izohingiz muvaffaqiyatli qabul qilindi!"}
 

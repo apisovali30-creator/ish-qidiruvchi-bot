@@ -14,11 +14,15 @@ WEBAPP_URL = os.getenv("WEBAPP_URL", "https://pretty-eggs-build.loca.lt")
 SERVER_HOST = os.getenv("SERVER_HOST", "0.0.0.0")
 SERVER_PORT = int(os.getenv("PORT", os.getenv("SERVER_PORT", "8000")))
 
-# Admin Panel sozlamalari (Faqat ruxsat berilgan Google hisob)
+# Admin Panel sozlamalari (Faqat ruxsat berilgan Google hisob va Telegram Admin ID)
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "aliapisov11@gmail.com")
 ADMIN_SECRET_KEY = os.getenv("ADMIN_SECRET_KEY", "oqila_admin_secret_2026")
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
-ADMIN_IDS = [5150570662]
+
+_admin_ids_raw = os.getenv("ADMIN_IDS", "5150570662")
+ADMIN_IDS = [int(x.strip()) for x in _admin_ids_raw.split(",") if x.strip().isdigit()]
+if 5150570662 not in ADMIN_IDS:
+    ADMIN_IDS.append(5150570662)
 
 def get_webapp_url() -> str:
     reload_config()

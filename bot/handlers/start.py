@@ -10,86 +10,92 @@ from aiogram.types import (
     WebAppInfo,
     MenuButtonWebApp
 )
-from config import get_webapp_url
+from config import get_webapp_url, ADMIN_IDS
+import database.db as db
 
 logger = logging.getLogger(__name__)
 router = Router()
 
-def get_start_inline_keyboard() -> InlineKeyboardMarkup:
-    url = get_webapp_url()
-    
-    if url.startswith("https://"):
-        return InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text="🚀 Ilovani ochish (Mini App)",
-                        web_app=WebAppInfo(url=url)
-                    )
-                ],
-                [
-                    InlineKeyboardButton(
-                        text="🧹 Farroshlar",
-                        web_app=WebAppInfo(url=f"{url}#farrosh")
-                    ),
-                    InlineKeyboardButton(
-                        text="👶 Enagalar",
-                        web_app=WebAppInfo(url=f"{url}#enaga")
-                    )
-                ],
-                [
-                    InlineKeyboardButton(
-                        text="➕ Anketa / E'lon berish",
-                        web_app=WebAppInfo(url=f"{url}#create")
-                    )
-                ]
-            ]
-        )
-    else:
-        return InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text="🌐 Ilovani brauzerda ochish",
-                        url=url
-                    )
-                ]
-            ]
-        )
+def is_admin(user_id: int) -> bool:
+    return user_id in ADMIN_IDS
 
-def get_start_reply_keyboard() -> ReplyKeyboardMarkup:
+def get_start_inline_keyboard(user_id: int = 0) -> InlineKeyboardMarkup:
+    url = get_webapp_url()
+    admin_url = f"{url}/admin" if url.startswith("http") else url
+    
+    buttons = [
+        [
+            InlineKeyboardButton(
+                text="🚀 Ilovani ochish (Mini App)",
+                web_app=WebAppInfo(url=url) if url.startswith("https://") else None,
+                url=url if not url.startswith("https://") else None
+            )
+        ]
+    ]
+
+    # Admin bo'lsa, xavfsiz Admin Panel tugmasini ham qo'shamiz
+    if is_admin(user_id):
+        buttons.append([
+            InlineKeyboardButton(
+                text="👑 Google Admin Panelni ochish",
+                url=admin_url
+            )
+        ])
+
+    buttons.extend([
+        [
+            InlineKeyboardButton(
+                text="🧹 Farroshlar",
+                web_app=WebAppInfo(url=f"{url}#farrosh") if url.startswith("https://") else None,
+                url=f"{url}#farrosh" if not url.startswith("https://") else None
+            ),
+            InlineKeyboardButton(
+                text="👶 Enagalar",
+                web_app=WebAppInfo(url=f"{url}#enaga") if url.startswith("https://") else None,
+                url=f"{url}#enaga" if not url.startswith("https://") else None
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text="➕ Anketa / E'lon berish",
+                web_app=WebAppInfo(url=f"{url}#create") if url.startswith("https://") else None,
+                url=f"{url}#create" if not url.startswith("https://") else None
+            )
+        ]
+    ])
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+def get_start_reply_keyboard(user_id: int = 0) -> ReplyKeyboardMarkup:
     url = get_webapp_url()
     
-    if url.startswith("https://"):
-        return ReplyKeyboardMarkup(
-            keyboard=[
-                [
-                    KeyboardButton(
-                        text="📱 Platformani ochish",
-                        web_app=WebAppInfo(url=url)
-                    )
-                ],
-                [
-                    KeyboardButton(text="ℹ️ Bot va Ilova haqida")
-                ]
-            ],
-            resize_keyboard=True
-        )
-    else:
-        return ReplyKeyboardMarkup(
-            keyboard=[
-                [
-                    KeyboardButton(text="ℹ️ Bot va Ilova haqida")
-                ]
-            ],
-            resize_keyboard=True
-        )
+    rows = [
+        [
+            KeyboardButton(
+                text="📱 Platformani ochish",
+                web_app=WebAppInfo(url=url) if url.startswith("https://") else None
+            )
+        ]
+    ]
+
+    if is_admin(user_id):
+        rows.append([
+            KeyboardButton(text="👑 Admin Panel"),
+            KeyboardButton(text="📊 Statistika")
+        ])
+
+    rows.append([
+        KeyboardButton(text="ℹ️ Bot va Ilova haqida")
+    ])
+
+    return ReplyKeyboardMarkup(keyboard=rows, resize_keyboard=True)
 
 @router.message(CommandStart())
 async def handle_start(message: Message) -> None:
+    user_id = message.from_user.id if message.from_user else 0
     user_name = message.from_user.first_name if message.from_user else "do'stim"
     url = get_webapp_url()
-    logger.info(f"[/start] qabul qilindi: ID={message.from_user.id if message.from_user else 'Unknown'}, Ism={user_name}")
+    logger.info(f"[/start] qabul qilindi: ID={user_id}, Ism={user_name}")
 
     # Xabar yozish qatori yonidagi MenuButton ni avtomatik 'Open' (Ilova) ga sozlash
     if url.startswith("https://") and message.bot:
@@ -104,6 +110,31 @@ async def handle_start(message: Message) -> None:
         except Exception as e:
             logger.warning(f"Chat menu button sozlashda xatolik: {e}")
 
+    # AGAR FOYDALANUVCHI ADMIN BO'LSA (masalan: 5150570662)
+    if is_admin(user_id):
+        admin_greeting = (
+            f"👑 <b>Assalomu alaykum, Hurmatli Bosh Admin ({user_name})!</b> 👋\n\n"
+            f"🆔 <b>Sizning ID raqamingiz:</b> <code>{user_id}</code>\n"
+            f"🛡 <b>Huquq holati:</b> Boshqaruvchi Admin (Tasdiqlangan)\n\n"
+            f"Siz bot va platformaning to'liq admin vakolatiga egasiz. "
+            f"Foydalanuvchilar qoldirgan barcha yangi e'lonlar, anketalar va sharhlar "
+            f"to'g'ridan-to'g'ri profilingizga xabarnoma sifatida keladi.\n\n"
+            f"Platformani boshqarish uchun quyidagi tugmalardan foydalaning 👇"
+        )
+        try:
+            await message.answer(
+                text=admin_greeting,
+                reply_markup=get_start_inline_keyboard(user_id)
+            )
+            await message.answer(
+                "Boshqaruv menyusi 👇",
+                reply_markup=get_start_reply_keyboard(user_id)
+            )
+        except Exception as e:
+            logger.error(f"Admin start xabarida xatolik: {e}")
+        return
+
+    # ODDIY FOYDALANUVCHILAR UCHUN
     text = (
         f"Assalomu alaykum, <b>{user_name}</b>! 👋\n\n"
         f"🌟 <b>Ishonchli Farrosh va Enagalar Platformasiga xush kelibsiz!</b>\n\n"
@@ -132,15 +163,74 @@ async def handle_start(message: Message) -> None:
     try:
         await message.answer(
             text=text,
-            reply_markup=get_start_inline_keyboard()
+            reply_markup=get_start_inline_keyboard(user_id)
         )
         await message.answer(
             "Xabar yozish qatori yonidagi <b>'Open'</b> tugmasi yoki quyidagi doimiy menyu orqali ham ilovani ochishingiz mumkin 👇",
-            reply_markup=get_start_reply_keyboard()
+            reply_markup=get_start_reply_keyboard(user_id)
         )
     except Exception as e:
         logger.error(f"Xabar yuborishda xatolik: {e}")
         await message.answer(text=text)
+
+@router.message(Command("admin"))
+@router.message(F.text == "👑 Admin Panel")
+@router.message(F.text == "📊 Statistika")
+async def handle_admin_command(message: Message) -> None:
+    user_id = message.from_user.id if message.from_user else 0
+    if not is_admin(user_id):
+        await message.answer("⛔️ Kechirasiz, sizda admin huquqlari mavjud emas.")
+        return
+
+    url = get_webapp_url()
+    admin_url = f"{url}/admin" if url.startswith("http") else url
+
+    try:
+        stats = await db.get_admin_stats()
+        farrosh_count = stats.get("farrosh_count", 0)
+        enaga_count = stats.get("enaga_count", 0)
+        vacancies_count = stats.get("total_vacancies", 0)
+        avg_rating = stats.get("avg_rating", 5.0)
+        reviews_count = stats.get("total_reviews", 0)
+    except Exception as e:
+        logger.error(f"Stats olishda xatolik: {e}")
+        farrosh_count = enaga_count = vacancies_count = reviews_count = 0
+        avg_rating = 5.0
+
+    stats_text = (
+        "👑 <b>Hurmatli Admin! Oqila Boshqaruv Markazi</b>\n"
+        f"🆔 Sizning profilingiz: <code>{user_id}</code> (Bosh Admin)\n\n"
+        "📊 <b>Platformaning real-vaqt statistikasi:</b>\n"
+        f"• 🧹 <b>Farroshlar:</b> {farrosh_count} nafar\n"
+        f"• 👶 <b>Enagalar:</b> {enaga_count} nafar\n"
+        f"• 📋 <b>Buyurtmalar:</b> {vacancies_count} ta\n"
+        f"• ⭐ <b>Mijozlar reytingi:</b> {avg_rating:.1f} ({reviews_count} ta izoh)\n\n"
+        "🌐 <b>Google Admin Panel:</b>\n"
+        f"Barcha nomzodlarni boshqarish, o'chirish va sharhlarni nazorat qilish uchun "
+        f"Google Chrome brauzeridan quyidagi havola orqali kiring:\n"
+        f"👉 <a href=\"{admin_url}\">{admin_url}</a>\n"
+        f"(Faqat sizning Google pochtangiz: <b>aliapisov11@gmail.com</b>)"
+    )
+
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="👑 Google Admin Panelni ochish",
+                    url=admin_url
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🚀 Mini App'ni ochish",
+                    web_app=WebAppInfo(url=url) if url.startswith("https://") else None,
+                    url=url if not url.startswith("https://") else None
+                )
+            ]
+        ]
+    )
+
+    await message.answer(stats_text, reply_markup=kb)
 
 @router.message(F.text == "ℹ️ Bot va Ilova haqida")
 @router.message(Command("help"))
@@ -155,10 +245,11 @@ async def handle_help(message: Message) -> None:
         "4. <b>'⭐ Izoh qoldirish'</b> — Ishni bitirgach, xodim profiliga o'tib, yulduzchalar va samimiy fikr bildirish.\n"
         "5. <b>'➕ Anketa berish'</b> — O'zingiz haqingizda e'lon berish."
     )
+    user_id = message.from_user.id if message.from_user else 0
     try:
         await message.answer(
             text=help_text,
-            reply_markup=get_start_inline_keyboard()
+            reply_markup=get_start_inline_keyboard(user_id)
         )
     except Exception as e:
         logger.error(f"Yordam yuborishda xatolik: {e}")
@@ -167,8 +258,9 @@ async def handle_help(message: Message) -> None:
 # Har qanday boshqa matnli xabar kelganda ham yo'naltirish
 @router.message(F.text)
 async def handle_other_messages(message: Message) -> None:
-    logger.info(f"[Text message] qabul qilindi: '{message.text}' from {message.from_user.id if message.from_user else 'unknown'}")
+    user_id = message.from_user.id if message.from_user else 0
+    logger.info(f"[Text message] qabul qilindi: '{message.text}' from {user_id}")
     await message.answer(
         "Iltimos, platformadan foydalanish uchun quyidagi tugmani bosing yoki /start yuboring:",
-        reply_markup=get_start_inline_keyboard()
+        reply_markup=get_start_inline_keyboard(user_id)
     )
